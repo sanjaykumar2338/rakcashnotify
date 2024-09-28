@@ -181,7 +181,7 @@
                                 <p class="fs-2 fw-bold text-uppercase mb-0">Standard</p>
                                 <div class="d-flex justify-content-center">
                                     <strong class="align-self-start">$</strong>
-                                    <p class="mb-0"><span class="display-5">2.99</span>/mo</p>
+                                    <p class="mb-0"><span class="display-5">1.99</span>/mo</p>
                                 </div>                        
                             </div>
                             <div class="text-start p-5">
@@ -196,6 +196,9 @@
                                 <p><i class="fas fa-times text-danger me-1"></i> Creative Assistant</p>
                                 <p class="mb-4"><i class="fas fa-times text-danger me-1"></i> Role-based Access</p>
                                 <button class="btn btn-light rounded-pill py-2 px-5" type="button">Get Started</button>
+                                
+                                <a href="{{ route('subscription.create', 'P-4CJ65461T4509580WM3ZP5DY') }}">Subscribe Now</a>
+
                             </div>
                         </div>
                     </div>
@@ -205,7 +208,7 @@
                                 <p class="fs-2 fw-bold text-uppercase mb-0">Premium</p>
                                 <div class="d-flex justify-content-center">
                                     <strong class="align-self-start">$</strong>
-                                    <p class="mb-0"><span class="display-5">7.99</span>/mo</p>
+                                    <p class="mb-0"><span class="display-5">4.99</span>/mo</p>
                                 </div>                        
                             </div>
                             <div class="text-start p-5">
@@ -251,5 +254,34 @@
     <!-- Template Javascript -->
     <script src="{{asset('asset/theme/js/main.js')}}"></script>
     </body>
+
+    <div id="paypal-button-container-P-4120624135486332GM3ZP53Y"></div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=ATTC6HT1v7miPRyQwTF2UCCGaOaKYi4azDFOY6qzS5CHTV6tTtQZPm-A3Q4-s8-S_5uXhHgNshk7SWsS&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
+
+<script>
+  paypal.Buttons({
+      style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'paypal'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          /* Creates the subscription */
+          plan_id: 'P-4120624135486332GM3ZP53Y',
+          application_context: {
+              return_url: '{{ route("subscription.success") }}',  // The URL for a successful payment
+              cancel_url: '{{ route("subscription.cancel") }}'    // The URL for a canceled subscription
+          }
+        });
+      },
+      onApprove: function(data, actions) {
+        alert('Subscription successful! Subscription ID: ' + data.subscriptionID); // Optional success message
+      }
+  }).render('#paypal-button-container-P-4120624135486332GM3ZP53Y'); // Renders the PayPal button
+</script>
+
 
 </html>

@@ -20,6 +20,8 @@ use Laravel\Cashier\Http\Controllers\WebhookController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 
+use App\Http\Controllers\Paypal\PaypalSubscriptionController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -178,3 +180,7 @@ Route::get('/webhook2', [App\Http\Controllers\HomeController::class, 'webhook'])
 // new website
 Route::get('/',[CashbackController::class,'index']);
 Route::get('/contact',[CashbackController::class,'contact']);
+
+Route::get('subscription/create/{planId}', [PaypalSubscriptionController::class, 'createSubscription'])->name('subscription.create');
+Route::get('subscription/success', [PaypalSubscriptionController::class, 'success'])->name('subscription.success');
+Route::get('subscription/cancel', [PaypalSubscriptionController::class, 'cancel'])->name('subscription.cancel');

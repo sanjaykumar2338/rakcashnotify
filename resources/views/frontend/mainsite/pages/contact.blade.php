@@ -1,10 +1,10 @@
 <!-- Contact Start -->
-@extends('frontend.mainsite.layouts.other')
+@extends('frontend.mainsite.layouts.common')
 @section('content')
-<div class="container-fluid contact py-1">
+<div class="container-fluid py-1">
             <div class="container py-5">
                 <div class="row g-5 align-items-center">
-                    <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
+                    <div class="col-lg-12 wow fadeInLeft" data-wow-delay="0.1s">
                         @if (count($errors) > 0)
                             <div class="alert alert-danger">
                                 <ul>
@@ -63,15 +63,6 @@
                                 <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
                             </div>
                         </form>
-                    </div>
-                    <div class="col-lg-6 stwow fadeInRight" style="padding-bottom: 323px;" data-wow-delay="0.3s">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light d-flex align-items-center justify-content-center" style="width: 90px; height: 90px; border-radius: 50px;"><i class="fa fa-envelope-open fa-2x text-primary"></i></div>
-                            <div class="">
-                                <h4>Email</h4>
-                                <p class="mb-0">info@rakcashnotify.com</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

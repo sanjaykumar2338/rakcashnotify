@@ -90,23 +90,6 @@
             '<i class="bi bi-arrow-right"></i>'
         ],
     });
-
-    
-    
-   // Back to top button
-   $(window).scroll(function () {
-    if ($(this).scrollTop() > 300) {
-        $('.back-to-top').fadeIn('slow');
-    } else {
-        $('.back-to-top').fadeOut('slow');
-    }
-    });
-    $('.back-to-top').click(function () {
-        $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
-        return false;
-    });
-
-
     function myMove() {
         let id = null;
         const elem = document.getElementById("animate");   
@@ -124,8 +107,13 @@
         }
       }
 
-
-   
-
 })(jQuery);
+
+
+document.querySelector('.back-to-top').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector('#home').scrollIntoView({
+        behavior: 'smooth'
+    });
+});
 

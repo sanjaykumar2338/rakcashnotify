@@ -5,15 +5,28 @@ use App\Http\Controllers\Controller;
 
 use PayPalHttp\HttpException;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Illuminate\Http\Request;
 
 class PaypalSubscriptionController extends Controller
 {
     protected $provider;
+    protected $paypalAuthAPI;
+    protected $paypalProductAPI;
+    protected $paypalBillingAPI;
+    protected $paypalSecret;
+    protected $sandbox;
 
     public function __construct()
     {
         $this->provider = new PayPalClient;
         $this->provider->setApiCredentials(config('paypal'));
+        $this->sandbox = env('PAYPAL_SANDBOX');
+
+        $this->paypalAuthAPI  = $this->sandbox?'https://api-m.sandbox.paypal.com/v1/oauth2/token':'https://api-m.paypal.com/v1/oauth2/token'; 
+        $this->paypalProductAPI = $this->sandbox?'https://api-m.sandbox.paypal.com/v1/catalogs/products':'https://api-m.paypal.com/v1/catalogs/products';  
+        $this->paypalBillingAPI = $this->sandbox?'https://api-m.sandbox.paypal.com/v1/billing':'https://api-m.paypal.com/v1/billing'; 
+        $this->paypalClientID = env('PAYPAL_CLIENT_ID');  
+        $this->paypalSecret = env('PAYPAL_CLIENT_SECRET');    
     }
 
     public function createSubscription($planId)
@@ -49,5 +62,267 @@ class PaypalSubscriptionController extends Controller
     {
         // Handle subscription cancellation logic
         return view('subscription.cancel');
+    }
+
+    public function generateAccessToken(){ 
+        $ch = curl_init();   
+        curl_setopt($ch, CURLOPT_URL, $this->paypalAuthAPI);   
+        curl_setopt($ch, CURLOPT_HEADER, false);   
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);   
+        curl_setopt($ch, CURLOPT_POST, true);   
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);   
+        curl_setopt($ch, CURLOPT_USERPWD, $this->paypalClientID.":".$this->paypalSecret);   
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");   
+        $auth_response = json_decode(curl_exec($ch));  
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
+        curl_close($ch);   
+  
+        if ($http_code != 200 && !empty($auth_response->error)) {   
+            throw new \Exception('Failed to generate Access Token: '.$auth_response->error.' >>> '.$auth_response->error_description);   
+        }  
+           
+        if(!empty($auth_response)){  
+            return $auth_response->access_token;   
+        }else{  
+            return false;  
+        }  
+    } 
+ 
+    public function createPlan(){  
+        $planInfo1 = \DB::table('plans')->where('id',3)->first();
+        $planInfo = (array) $planInfo1; // Cast the object to an array
+
+        $accessToken = $this->generateAccessToken();  
+        if(empty($accessToken)){  
+            return false;   
+        }else{  
+            $postParams = array( 
+                "name" => $planInfo['name'], 
+                "type" => "DIGITAL", 
+                "category" => "SOFTWARE" 
+            );  
+  
+            $ch = curl_init();  
+            curl_setopt($ch, CURLOPT_URL, $this->paypalProductAPI);  
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);   
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer '. $accessToken));   
+            curl_setopt($ch, CURLOPT_POST, true);  
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postParams)); 
+            $api_resp = curl_exec($ch);  
+            $pro_api_data = json_decode($api_resp);  
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   
+            curl_close($ch);  
+  
+            if ($http_code != 200 && $http_code != 201) {   
+                return 'Failed to create Product ('.$http_code.'): '.$api_resp;   
+            }  
+             
+            if(!empty($pro_api_data->id)){ 
+                $formattedPrice = number_format($planInfo['price'], 2);
+
+                $postParams = array(  
+                    "product_id" => $pro_api_data->id, 
+                    "name" => $planInfo['name'], 
+                    "billing_cycles" => array(  
+                        array(  
+                            "frequency" => array(  
+                                "interval_unit" => $planInfo['interval'],  
+                                "interval_count" => $planInfo['interval_count']  
+                            ), 
+                            "tenure_type" => "REGULAR", 
+                            "sequence" => 1, 
+                            "total_cycles" => 999, 
+                            "pricing_scheme" => array(  
+                                "fixed_price" => array(                                     
+                                    "value" => $formattedPrice, 
+                                    "currency_code" => env('PAYPAL_CURRENCY') 
+                                ) 
+                            ), 
+                        )  
+                    ), 
+                    "payment_preferences" => array(  
+                        "auto_bill_outstanding" => true 
+                    ) 
+                );  
+      
+                $ch = curl_init();  
+                curl_setopt($ch, CURLOPT_URL, $this->paypalBillingAPI.'/plans');  
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);   
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer '. $accessToken));   
+                curl_setopt($ch, CURLOPT_POST, true);  
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postParams));   
+                $api_resp = curl_exec($ch);  
+                $plan_api_data = json_decode($api_resp, true);  
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   
+                curl_close($ch);  
+      
+                if ($http_code != 200 && $http_code != 201) {   
+                    return 'Failed to create Product ('.$http_code.'): '.$api_resp;   
+                }  
+                 
+                return !empty($plan_api_data)?$plan_api_data:false; 
+            }else{ 
+                return false; 
+            } 
+        }  
+    } 
+     
+    public function getSubscription($subscription_id){ 
+        $accessToken = $this->generateAccessToken();  
+        if(empty($accessToken)){  
+            return false;   
+        }else{  
+            $ch = curl_init(); 
+            curl_setopt($ch, CURLOPT_URL, $this->paypalBillingAPI.'/subscriptions/'.$subscription_id); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);  
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer '. $accessToken));  
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET'); 
+            $api_data = json_decode(curl_exec($ch), true); 
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);  
+            curl_close($ch); 
+ 
+            if ($http_code != 200 && !empty($api_data['error'])) {  
+                throw new Exception('Error '.$api_data['error'].': '.$api_data['error_description']);  
+            } 
+ 
+            return !empty($api_data) && $http_code == 200?$api_data:false; 
+        } 
+    } 
+
+    public function savesubscription(Request $request)
+    {
+        // Validate incoming data
+        $request->validate([
+            'order_id' => 'required|string',
+            'subscription_id' => 'required|string',
+            'plan_id' => 'required|integer',
+        ]);
+
+        $order_id = $request->input('order_id');
+        $subscription_id = $request->input('subscription_id');
+        $db_plan_id = $request->input('plan_id');
+
+        // Initialize PayPal API (assuming $paypal is set up properly)
+        try {
+            $subscr_data = $paypal->getSubscription($subscription_id);
+        } catch (Exception $e) {
+            return response()->json(['status' => 0, 'msg' => $e->getMessage()]);
+        }
+
+        if (!empty($subscr_data)) {
+            $status = $subscr_data['status'];
+            $subscr_id = $subscr_data['id'];
+            $plan_id = $subscr_data['plan_id'];
+            $custom_user_id = $subscr_data['custom_id'] ?? null;
+
+            $created = (new DateTime($subscr_data['create_time']))->format("Y-m-d H:i:s");
+            $valid_from = (new DateTime($subscr_data['start_time']))->format("Y-m-d H:i:s");
+
+            // Get subscriber info
+            $subscriber_email = $subscr_data['subscriber']['email_address'] ?? null;
+            $subscriber_id = $subscr_data['subscriber']['payer_id'] ?? null;
+            $subscriber_name = trim($subscr_data['subscriber']['name']['given_name'] ?? '') . ' ' . trim($subscr_data['subscriber']['name']['surname'] ?? '');
+
+            // Insert user details if not exists in the DB
+            if (empty($custom_user_id)) {
+                $user = User::firstOrCreate(
+                    ['email' => $subscriber_email],
+                    ['first_name' => trim($subscr_data['subscriber']['name']['given_name'] ?? ''), 
+                    'last_name' => trim($subscr_data['subscriber']['name']['surname'] ?? ''), 
+                    'created_at' => now()]
+                );
+                $custom_user_id = $user->id;
+            }
+
+            // Get billing information
+            $outstanding_balance_value = $subscr_data['billing_info']['outstanding_balance']['value'] ?? null;
+            $last_payment_amount = $subscr_data['billing_info']['last_payment']['amount']['value'] ?? null;
+            $last_payment_curreny = $subscr_data['billing_info']['last_payment']['amount']['currency_code'] ?? null;
+            $valid_to = (new DateTime($subscr_data['billing_info']['next_billing_time']))->format("Y-m-d H:i:s");
+
+            // Check if a subscription with the same ID exists
+            $subscription = UserSubscription::where('paypal_order_id', $order_id)->first();
+
+            if (!$subscription) {
+                // Insert subscription data into the database
+                $subscription = UserSubscription::create([
+                    'user_id' => $custom_user_id,
+                    'plan_id' => $db_plan_id,
+                    'paypal_order_id' => $order_id,
+                    'paypal_plan_id' => $plan_id,
+                    'paypal_subscr_id' => $subscr_id,
+                    'valid_from' => $valid_from,
+                    'valid_to' => $valid_to,
+                    'paid_amount' => $last_payment_amount,
+                    'currency_code' => $last_payment_curreny,
+                    'subscriber_id' => $subscriber_id,
+                    'subscriber_name' => $subscriber_name,
+                    'subscriber_email' => $subscriber_email,
+                    'status' => $status,
+                    'created_at' => $created,
+                    'updated_at' => now(),
+                ]);
+
+                // Update subscription ID in users table
+                $user->subscription_id = $subscription->id;
+                $user->save();
+            }
+
+            // Return success response with encoded order ID
+            $ref_id_enc = base64_encode($order_id);
+            return response()->json(['status' => 1, 'msg' => 'Subscription created!', 'ref_id' => $ref_id_enc]);
+
+        } else {
+            // Return error response if subscription data is empty
+            return response()->json(['status' => 0, 'msg' => 'Subscription data not found.']);
+        }
+    }
+
+    public function payment_page(Request $request, $id){
+        $plan = \DB::table('plans')->where('id',$id)->first();
+        $page = (object) ['title' => 'Payment','description' => ''];
+        $plan_id = env('PAYPAL_MODE') == 'sandbox' ? $plan->dev_plan_id:$plan->live_plan_id;
+        return view('frontend.mainsite.pages.payment',compact('page','plan','plan_id'));
+    }
+
+    public function payment_status(Request $request)
+    {
+        $statusMsg = '';
+        $status = 'error';
+
+        // Check if the `checkout_ref_id` is present in the request
+        if ($request->has('checkout_ref_id')) {
+            // Decode the PayPal order ID
+            $paypal_order_id = base64_decode($request->input('checkout_ref_id'));
+
+            // Fetch subscription data from the database using Eloquent ORM
+            $subscription = DB::table('user_subscriptions as S')
+                ->leftJoin('plans as P', 'P.id', '=', 'S.plan_id')
+                ->select('S.*', 'P.name as plan_name', 'P.price as plan_price', 'P.interval', 'P.interval_count')
+                ->where('S.paypal_order_id', $paypal_order_id)
+                ->first();
+
+            // Check if subscription data is found
+            if ($subscription) {
+                $status = 'success';
+                $statusMsg = 'Your Subscription Payment has been Successful!';
+            } else {
+                $statusMsg = 'Subscription has failed!';
+            }
+        } else {
+            // Redirect to homepage if no reference ID is provided
+            return redirect('/');
+        }
+        
+
+        // Pass the status and message to the view
+        return view('frontend.mainsite.pages.paymentstatus', [
+            'status' => $status,
+            'statusMsg' => $statusMsg,
+            'subscription' => $subscription ?? null
+        ]);
     }
 }

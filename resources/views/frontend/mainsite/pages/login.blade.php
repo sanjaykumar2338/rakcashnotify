@@ -1,5 +1,4 @@
-@extends('frontend.layout.homepagenew')
-
+@extends('frontend.mainsite.layouts.common')
 @section('content')
 
     <style>
@@ -73,12 +72,11 @@
 
     </style>
 
-    <section class="main-section full-container">
-        <div class="container flex l-gap  flex-mobile">
-            @includeIf('frontend.layout.sidebar')
-            <div class="page-content pg-l">
-                <h1 class="page-title">Login</h1>
-
+<div class="container-fluid py-1">
+    <div class="container py-5">
+        <h2 class="display-5 mb-2">Login</h2>
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-12 wow fadeInLeft" data-wow-delay="0.1s">
                 <form method="POST" action="{{ route('login') }}">
 
                     @csrf
@@ -98,22 +96,48 @@
                             {{ session('message') }}
                         </div>
                     @endif
-
-                    <label for="uname"><b>Email</b></label>
-                    <input type="text" placeholder="Enter Username" name="email">
-
-                    <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password">
-                    <br><br>
-                    <input type="submit" id="submit" class="l-submit" value="Login">
-
-                    <div class="Login-form-submit-section">
-                        <span>Don't have an account yet? <a href="{{ route('register.form') }}">Create Account</a></span>
+                    <div class="row g-1">
+                    <div class="row g-3">
+                        <!-- Email Field -->
+                        <div class="col-lg-12">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                                <label for="email">Your Email</label>
+                            </div>
+                        </div>
                     </div>
-                    Forgot your password? <a href="{{ route('password.request') }}">Reset Password</a>
+
+                    <div class="row g-3">
+                        <!-- Password Field -->
+                        <div class="col-lg-12">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" required>
+                                <label for="password">Password</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Submit Button -->
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary w-100 py-3" type="submit">Login</button>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Forgot Password and Register Section -->
+                        <div class="col-lg-12 text-center">
+                            <span>Don't have an account yet? <a href="{{ route('register.form') }}">Create Account</a></span>
+                            <br>
+                            <a href="{{ route('password.request') }}" class="forgot-password">Forgot your password?</a>
+                        </div>
+                    </div>
+                </div>
+
                 </form>
             </div>
         </div>
-    </section>
+    </div>
+    </div>
 
 @endsection

@@ -9,7 +9,7 @@
 
         <h1 style="margin: 10px 0 15px; font-size: 28px; line-height: normal; text-align: center;">Reset Password</h1>
 
-        <a href="{{ $resetUrl }}" style="background-color: #95bb3c; padding: 7px 20px; border-radius: 50px; font-size: 25px; font-weight: bolder; color: #000000 !important; text-decoration: none; display: inline-block; margin: 20px 0; line-height: normal;border: solid 2px black;font-family: sans-serif;s">Reset Password</a>
+        <a href="{{ $resetUrl }}" style="background-color: #f74780; padding: 7px 20px; border-radius: 50px; font-size: 25px; font-weight: bolder; color: #000000 !important; text-decoration: none; display: inline-block; margin: 20px 0; line-height: normal;border: solid 1px;font-family: sans-serif;s">Reset Password</a>
 
         <p style="margin: 0 0 10px; font-size: 16px; text-align: center; line-height: normal;">Or click here: <a href="{{ $resetUrl }}">{{ $resetUrl }}</a></p>
 

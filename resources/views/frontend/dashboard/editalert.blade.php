@@ -271,8 +271,5 @@
         $('#store').val($('#current_store_id').val()).trigger('change');
     }, 1000);
 </script>
-
-@includeIf('frontend.layout.hero-section')
-
 @endsection
 

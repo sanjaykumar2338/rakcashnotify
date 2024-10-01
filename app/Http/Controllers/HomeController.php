@@ -309,11 +309,11 @@ class HomeController extends Controller
     }
 
     public function login() {
-        return view('frontend.pages.login');
+        return view('frontend.mainsite.pages.login');
     }
 
     public function register() {
-        return view('frontend.pages.register');
+        return view('frontend.mainsite.pages.register');
     }
 
     public function webhook(Request $request){

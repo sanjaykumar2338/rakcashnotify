@@ -1,120 +1,141 @@
-@extends('frontend.layout.homepagenew')
+@extends('frontend.mainsite.layouts.dashboard')
 @section('content')
-    <section class="main-section full-container">
-        <div class="container flex l-gap flex-mobile lr-m">
+
+<style>
+    .sidebar {
+        width: 250px;
+        min-width: 150px;
+        max-width: 400px;
+        top: 0;
+        left: 0;
+        background-color: #333;
+        color: #fff;
+        padding-top: 20px;
+        overflow-y: auto;
+        transition: width 0.3s ease;
+        padding-inline: 8px;
+        height: 70vh;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar ul li {
+        padding: 20px;
+        border-bottom: 1px solid #555;
+    }
+
+    .sidebar ul li a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .sidebar ul li a:hover {
+        background-color: #555;
+    }
+
+
+</style>
+<div class="container-fluid py-1">
+    <div class="container py-5">
+        <div class="row g-5 align-items-start" style="background-color: ghostwhite;">
             
-            @includeIf('frontend.layout.dashboardsidebar')
-            <div class="page-content home">
-                <h1 class="page-title">Profile</h1>
-                <div class="cmn-form">
+            <!-- Sidebar Section (30% width) -->
+            @include('frontend.layout.dashboardsidebar')
 
-                    <style>
-                        .alert-danger {
-                            color: #721c24;
-                            background-color: #f8d7da;
-                            border-color: #f5c6cb;
-                        }
+            <!-- Profile Update Form Section (70% width) -->
+            <div class="col-lg-8  fadeInLeft" data-wow-delay="0.1s">
+                @if (count($errors) > 0)
+                    <div class = "alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                        .alert {
-                            padding: 2px;
-                            margin-bottom: 50px;
-                            border: 1px solid transparent;
-                            border-radius: 4px;
-                        }
-                    </style>
+                @if(session('error'))
+                    <div class="alert alert-danger" role="alert" style="">
+                        {{ session('error') }}
+                    </div><br>
+                @endif
 
-                    @if (count($errors) > 0)
-                        <div class = "alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger" role="alert" style="">
-                            {{ session('error') }}
-                        </div><br>
-                    @endif
-
-                    @if(session('success'))
-                        <div class="alert alert-success" style="color: green;font-size: 18px;">
-                            {{ session('success') }}
-                        </div><br>
-                    @endif
-
-                    <form name="profile_update" method="post" action="{{route('profile.update')}}">
-                        @csrf
-                        
+                @if(session('success'))
+                    <div class="alert alert-success" style="color: green;font-size: 18px;">
+                        {{ session('success') }}
+                    </div><br>
+                @endif
+                
+                <h2 class="display-10 mb-2">Profile</h2>
+                <form name="profile_update" method="post" action="{{route('profile.update')}}">
+                    @csrf
+                    
+                    <div class="row g-2">
                         <div class="form-control-input">
-                            <label>First Name:
-                            </label>
+                            <label>First Name:</label>
                             <input type="text" class="l-operator form-control" placeholder="Enter First Name" id="first_name" name="first_name" value="{{auth()->user()->first_name}}">
                         </div>
 
                         <div class="form-control-input">
-                            <label>Last Name:
-                            </label>
+                            <label>Last Name:</label>
                             <input type="text" class="l-operator form-control" placeholder="Enter Last Name" id="last_name" name="last_name" value="{{auth()->user()->last_name}}">
                         </div>
 
                         <div class="form-control-input">
-                            <label>Email:
-                            </label>
+                            <label>Email:</label>
                             <input type="text" class="l-operator form-control" placeholder="Enter Email" id="email" name="email" value="{{auth()->user()->email}}">
                         </div>
 
                         <div class="form-control-input">
-                            <label>Phone:
-                            </label>
+                            <label>Phone:</label>
                             <input type="text" class="l-operator form-control" placeholder="Enter Phone Number" id="phone_number" name="phone_number" value="{{auth()->user()->phone_number}}">
                         </div>
 
                         <div class="form-control-input">
-                            <label>New Password:
-                            </label>
+                            <label>New Password:</label>
                             <input autocomplete="new-password" type="password" class="l-operator form-control" placeholder="Enter new password" id="password" name="password" value="">
                         </div>
 
                         <div class="form-control-input">
-                            <label>Conf. Password:
-                            </label>
+                            <label>Conf. Password:</label>
                             <input autocomplete="new-password" type="password" class="l-operator form-control" placeholder="Confirm new password" id="password_confirmation" name="password_confirmation" value="">
                         </div>
 
                         <div class="form-control-add">
-                            <input type="submit" id="submit" class="l-submit" value="Update">
+                            <input type="submit" id="submit" class="btn btn-primary w-100 py-3"  value="Update">
                         </div>
-                    </form>                   
-                </div>
+                    </div>
+                </form>                   
             </div>
         </div>
-</section>
+    </div>
+</div>
+
 <script>
-    document.getElementById('store').addEventListener('change', function() {
-        var storeId = this.value;
-        if (storeId) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/check_store/' + storeId, true);
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if(!response.exist){
-                        alert(response.message);
+    if(document.getElementById('store')){
+        document.getElementById('store').addEventListener('change', function() {
+            var storeId = this.value;
+            if (storeId) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/check_store/' + storeId, true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        if(!response.exist){
+                            alert(response.message);
+                        }
+                        // You can further handle the response here
+                    } else {
+                        alert('Request failed. Please try again later.');
                     }
-                    // You can further handle the response here
-                } else {
-                    alert('Request failed. Please try again later.');
-                }
-            };
-            xhr.send();
-        }
-    });
+                };
+                xhr.send();
+            }
+        }); 
+    }
 </script>
-
-@includeIf('frontend.layout.hero-section')
-
 @endsection
-

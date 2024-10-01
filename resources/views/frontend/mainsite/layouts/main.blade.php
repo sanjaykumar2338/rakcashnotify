@@ -28,6 +28,8 @@
 
         <!-- Template Stylesheet -->
         <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
     </head>
 
     <body>
@@ -42,7 +44,7 @@
 
 
         <!-- Navbar & Hero Start -->
-        <div class="container-fluid header position-relative overflow-hidden p-0">
+        <div class="container-fluid header position-relative overflow-hidden p-0" id="home">
             
             @include('frontend.mainsite.layouts.nav')
 
@@ -89,12 +91,22 @@
         <!-- About End -->
 
 
-        <!-- Feature Start -->
+       <!-- Feature Start -->
         <div class="container-fluid feature overflow-hidden py-5">
             <div class="container py-5">
-                <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 900px;">
-                    <h4 class="text-primary">Our Feature</h4>
-                    <p class="fs-4 mb-4 wow fadeInUp">RakCashNotify is your ultimate tool for staying on top of the best Rakuten cashback deals. By simply signing up, you can customize your preferences to receive timely notifications via email or SMS when your favorite stores offer significant cashback. Our platform ensures you never miss out on savings, providing a seamless and straightforward way to shop smarter. With RakCashNotify, you're always in the know, making it easier to maximize your earnings and shop with confidence. Join today and take control of your savings with personalized alerts tailored to your shopping habits.
+                <div class="mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 900px;">
+                    <h4 class="text-primary text-left">Our Feature</h4>
+                    <p class="fs-4 mb-4 text-left">
+                        RakCashNotify is your ultimate tool for staying on top of the best Rakuten cashback deals. By simply signing up, 
+                        you can customize your preferences to receive timely notifications via email or SMS when your favorite stores offer 
+                        significant cashback.
+                    </p>
+                    <p class="fs-4 mb-4 text-left">
+                        Our platform ensures you never miss out on savings, providing a seamless and straightforward way to shop smarter. 
+                        With RakCashNotify, you're always in the know, making it easier to maximize your earnings and shop with confidence.
+                    </p>
+                    <p class="fs-4 mb-4 text-left">
+                        Join today and take control of your savings with personalized alerts tailored to your shopping habits.
                     </p>
                 </div>
             </div>
@@ -102,8 +114,9 @@
         <!-- Feature End -->
 
 
+
         <!-- FAQ Start -->
-        <div class="container-fluid FAQ bg-light overflow-hidden py-5">
+        <div class="container-fluid FAQ bg-light overflow-hidden py-5" id="faqs">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 900px;">
                 <h4 class="text-primary">Faqs</h4>
             </div>
@@ -141,13 +154,10 @@
 
 
         <!-- Pricing Start -->
-        <div class="container-fluid price py-5">
+        <div class="container-fluid price py-5" id="plans">
             <div class="container py-5">
                 <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 900px;">
                     <h4 class="text-primary">Pricing Plan</h4>
-                    <h1 class="display-5 mb-4">Not Sure Which Plan Is For You?</h1>
-                    <p class="mb-0">Dolor sit amet consectetur, adipisicing elit. Ipsam, beatae maxime. Vel animi eveniet doloremque reiciendis soluta iste provident non rerum illum perferendis earum est architecto dolores vitae quia vero quod incidunt culpa corporis, porro doloribus. Voluptates nemo doloremque cum.
-                    </p>
                 </div>
                 <div class="row g-5 justify-content-center">
                     <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.1s">
@@ -159,21 +169,14 @@
                                     <p class="mb-0"><span class="display-5">00</span>/mo</p>
                                 </div>                        
                             </div>
-                            <div class="text-start p-5">
-                                <p><i class="fas fa-check text-success me-1"></i> Limited Acess Library</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Customer Support</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Pre-built Email Templates</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Reporting & Analytics</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Forms & Landing Pages</p>
-                                <p><i class="fas fa-check text-success me-1"></i> A/B Testing</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Email Scheduling</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Automated Customer Journeys</p>
-                                <p><i class="fas fa-times text-danger me-1"></i> Creative Assistant</p>
-                                <p class="mb-4"><i class="fas fa-times text-danger me-1"></i> Role-based Access</p>
-                                <button class="btn btn-light rounded-pill py-2 px-5" type="button">Get Started</button>
+                            <div class="text-center p-5">
+                                <p class="fw-bold text-center">1 Alert</p>
+                                <p>&nbsp;</p>
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/2" type="button">Get Started</a>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="price-item bg-light rounded text-center">
                             <div class="pice-item-offer">Popular</div>
@@ -184,51 +187,34 @@
                                     <p class="mb-0"><span class="display-5">1.99</span>/mo</p>
                                 </div>                        
                             </div>
-                            <div class="text-start p-5">
-                                <p><i class="fas fa-check text-success me-1"></i> Limited Acess Library</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Customer Support</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Pre-built Email Templates</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Reporting & Analytics</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Forms & Landing Pages</p>
-                                <p><i class="fas fa-check text-success me-1"></i> A/B Testing</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Email Scheduling</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Automated Customer Journeys</p>
-                                <p><i class="fas fa-times text-danger me-1"></i> Creative Assistant</p>
-                                <p class="mb-4"><i class="fas fa-times text-danger me-1"></i> Role-based Access</p>
-                                <button class="btn btn-light rounded-pill py-2 px-5" type="button">Get Started</button>
-                                
-                                <a href="{{ route('subscription.create', 'P-4CJ65461T4509580WM3ZP5DY') }}">Subscribe Now</a>
-
+                            <div class="text-center p-5">
+                                <p class="fw-bold text-center">10 Alerts</p>
+                                <p>&nbsp;</p>
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/1" type="button">Get Started</a>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.5s">
                         <div class="price-item bg-light rounded text-center">
                             <div class="text-center text-secondary border-bottom d-flex flex-column justify-content-center p-4" style="width: 100%; height: 160px;">
                                 <p class="fs-2 fw-bold text-uppercase mb-0">Premium</p>
                                 <div class="d-flex justify-content-center">
                                     <strong class="align-self-start">$</strong>
-                                    <p class="mb-0"><span class="display-5">4.99</span>/mo</p>
+                                    <p class="mb-0"><span class="display-5">3.99</span>/mo</p>
                                 </div>                        
                             </div>
-                            <div class="text-start p-5">
-                                <p><i class="fas fa-check text-success me-1"></i> Limited Acess Library</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Customer Support</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Pre-built Email Templates</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Reporting & Analytics</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Forms & Landing Pages</p>
-                                <p><i class="fas fa-check text-success me-1"></i> A/B Testing</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Email Scheduling</p>
-                                <p><i class="fas fa-check text-success me-1"></i> Automated Customer Journeys</p>
-                                <p><i class="fas fa-times text-danger me-1"></i> Creative Assistant</p>
-                                <p class="mb-4"><i class="fas fa-times text-danger me-1"></i> Role-based Access</p>
-                                <button class="btn btn-light rounded-pill py-2 px-5" type="button">Get Started</button>
+                            <div class="text-center p-5">
+                                <p class="fw-bold text-center">Unlimited Alerts</p>
+                                <p class="fw-bold text-center">Top 30 Deals</p>
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/3" type="button">Get Started</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <!-- Pricing End -->
         
         <!-- Copyright Start -->
@@ -236,10 +222,9 @@
         <!-- Copyright End -->
 
 
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
+    <!-- Back to Top -->
+    <a href="" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
 
-        
     <!-- JavaScript Libraries -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -254,34 +239,4 @@
     <!-- Template Javascript -->
     <script src="{{asset('asset/theme/js/main.js')}}"></script>
     </body>
-
-    <div id="paypal-button-container-P-4120624135486332GM3ZP53Y"></div>
-
-<script src="https://www.paypal.com/sdk/js?client-id=ATTC6HT1v7miPRyQwTF2UCCGaOaKYi4azDFOY6qzS5CHTV6tTtQZPm-A3Q4-s8-S_5uXhHgNshk7SWsS&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
-
-<script>
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'paypal'
-      },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({
-          /* Creates the subscription */
-          plan_id: 'P-4120624135486332GM3ZP53Y',
-          application_context: {
-              return_url: '{{ route("subscription.success") }}',  // The URL for a successful payment
-              cancel_url: '{{ route("subscription.cancel") }}'    // The URL for a canceled subscription
-          }
-        });
-      },
-      onApprove: function(data, actions) {
-        alert('Subscription successful! Subscription ID: ' + data.subscriptionID); // Optional success message
-      }
-  }).render('#paypal-button-container-P-4120624135486332GM3ZP53Y'); // Renders the PayPal button
-</script>
-
-
 </html>

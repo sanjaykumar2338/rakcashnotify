@@ -110,8 +110,6 @@ Route::group(['middleware' => 'check.auth'], function () {
     Route::get('/editalert/{id}', [App\Http\Controllers\DashboardController::class, 'editalert'])->name('editalert');
 });
 
-//Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::post('/save_review', [App\Http\Controllers\HomeController::class, 'save_review'])->name('save_review');
 Route::get('/get_images', [App\Http\Controllers\HomeController::class, 'get_images'])->name('get_images');
 Route::get('/updateImageNames', [App\Http\Controllers\HomeController::class, 'updateImageNames'])->name('updateImageNames');
@@ -178,9 +176,14 @@ Route::get('/webhook1', [App\Http\Controllers\HomeController::class, 'webhook'])
 Route::get('/webhook2', [App\Http\Controllers\HomeController::class, 'webhook']);
 
 // new website
+Route::get('/home',[CashbackController::class,'index'])->name('home');
 Route::get('/',[CashbackController::class,'index']);
 Route::get('/contact',[CashbackController::class,'contact']);
 
 Route::get('subscription/create/{planId}', [PaypalSubscriptionController::class, 'createSubscription'])->name('subscription.create');
 Route::get('subscription/success', [PaypalSubscriptionController::class, 'success'])->name('subscription.success');
 Route::get('subscription/cancel', [PaypalSubscriptionController::class, 'cancel'])->name('subscription.cancel');
+Route::get('paypal/createplan', [PaypalSubscriptionController::class, 'createplan']);
+Route::get('paypal/savesubscription', [PaypalSubscriptionController::class, 'savesubscription']);
+Route::get('payment/{id}', [PaypalSubscriptionController::class, 'payment_page']);
+Route::get('payment_status', [PaypalSubscriptionController::class, 'payment_status']);

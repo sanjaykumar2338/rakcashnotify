@@ -95,7 +95,9 @@
                     request_type: 'capture_subscr',
                     order_id: data.orderID,
                     subscription_id: data.subscriptionID,
-                    plan_id: subscr_plan_id
+                    plan_id: subscr_plan_id,
+                    return_url: "/subscriptionstatus/success",  // Success URL
+                    cancel_url: "/subscriptionstatus/fail"      // Failure URL
                 };
 
                 const csrfToken = "{{ csrf_token() }}";
@@ -112,14 +114,17 @@
                     .then((response) => response.json())
                     .then((result) => {
                         if (result.status == 1) {
-                            // Redirect the user to the status page
-                            window.location.href = "/?ref_id=" + result.ref_id + "#plans";
+                            // Redirect the user to the success page
+                            window.location.href = postData.return_url;
                         } else {
-                            resultMessage(result.msg);
+                            // Redirect to cancel page
+                            window.location.href = postData.cancel_url;
                         }
                     })
                     .catch(error => {
                         console.error(error);
+                        // On error, redirect to failure URL
+                        window.location.href = postData.cancel_url;
                     })
                     .finally(() => {
                         // Ensure setProcessing(false) runs after all promises resolve or reject

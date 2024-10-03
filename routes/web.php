@@ -191,7 +191,8 @@ Route::get('payment/{id}', [PaypalSubscriptionController::class, 'payment_page']
 Route::get('payment_status', [PaypalSubscriptionController::class, 'payment_status']);
 Route::get('/cancel-subscription/{subscription_id}', [PaypalSubscriptionController::class, 'cancelSubscription'])->name('cancel.subscription');
 Route::get('/subscribe/free', [PaypalSubscriptionController::class, 'subscribeFree'])->name('subscribe.free');
-
+Route::get('/subscriptionstatus/success', [PaypalSubscriptionController::class, 'subscriptionSuccess']);
+Route::get('/subscriptionstatus/fail', [PaypalSubscriptionController::class, 'subscriptionFail']);
 
 Route::any('dd', function () {
 //    I-SB4F31EC1AR9

@@ -241,17 +241,20 @@ class PaypalSubscriptionController extends Controller
         }
     }
 
-    public function savesubscription(Request $request) {
+    public function savesubscription(Request $request)
+    {
         // Validate incoming data
         $request->validate([
             'order_id' => 'required|string',
             'subscription_id' => 'required|string',
-            'plan_id' => 'required',
+            'plan_id' => 'required'
         ]);
 
         $order_id = $request->input('order_id');
         $subscription_id = $request->input('subscription_id');
         $db_plan_id = $request->input('plan_id');
+        $return_url = $request->input('return_url');
+        $cancel_url = $request->input('cancel_url');
 
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
@@ -268,7 +271,7 @@ class PaypalSubscriptionController extends Controller
                 ->acceptJson()
                 ->get("{$paypalApiUrl}/v1/billing/subscriptions/{$subscription_id}");
         } catch (Exception $e) {
-            return response()->json(['status' => 0, 'msg' => $e->getMessage()]);
+            return response()->json(['status' => 0, 'msg' => $e->getMessage(), 'cancel_url' => $cancel_url]);
         }
 
         if (!empty($subscr_data)) {
@@ -295,7 +298,6 @@ class PaypalSubscriptionController extends Controller
                         'created_at' => now()]
                 );
                 $custom_user_id = $user->id;
-
             }
 
             // Get billing information
@@ -335,14 +337,25 @@ class PaypalSubscriptionController extends Controller
                 $user->save();
             }
 
-            // Return success response with encoded order ID
-            $ref_id_enc = base64_encode($order_id);
-            return response()->json(['status' => 1, 'msg' => 'Subscription created!', 'ref_id' => $ref_id_enc]);
+            // Return success response with the provided return_url
+            return response()->json(['status' => 1, 'msg' => 'Subscription created!', 'return_url' => $return_url]);
 
         } else {
-            // Return error response if subscription data is empty
-            return response()->json(['status' => 0, 'msg' => 'Subscription data not found.']);
+            // Return error response with the provided cancel_url
+            return response()->json(['status' => 0, 'msg' => 'Subscription data not found.', 'cancel_url' => $cancel_url]);
         }
+    }
+
+    // Success subscription handler
+    public function subscriptionSuccess()
+    {
+        return view('frontend.mainsite.pages.success'); // Load a success view
+    }
+
+    // Failed subscription handler
+    public function subscriptionFail()
+    {
+        return view('frontend.mainsite.pages.fail'); // Load a failure view
     }
 
     public function subscribeFree()

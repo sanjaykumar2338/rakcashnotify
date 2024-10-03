@@ -137,6 +137,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         window.history.replaceState(null, null, window.location.pathname);
     } else {
-        successMessage.style.display = 'none';
+        if(successMessage){
+            successMessage.style.display = 'none';
+        }
     }
 });

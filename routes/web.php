@@ -14,6 +14,8 @@ use App\Http\Controllers\TrackController;
 use App\Http\Controllers\CashbackController;
 
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 
@@ -33,7 +35,7 @@ use App\Http\Controllers\Paypal\PaypalSubscriptionController;
 |
 */
 
-Route::group(['prefix' => 'admin','middleware' => 'check.auth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'check.auth'], function () {
     Route::get('', [AdminController::class, 'index']);
     //Route::get('/',[ProductsController::class, 'product_show']);
     //Route::get('/show/{product}',[ProductsController::class,'product_view']);
@@ -156,7 +158,7 @@ Route::get('/subscription-cancel', [PaymentController::class, 'subscriptionCance
 // welcome page only for subscribed users
 Route::get('/welcome', 'SubscriptionController@showWelcome')->middleware('subscribed');
 Route::group(['middleware' => ['role:seller']], function () {
-  Route::get('/welcome', 'SubscriptionController@showWelcome');
+    Route::get('/welcome', 'SubscriptionController@showWelcome');
 });
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('cashier.webhook');
@@ -176,14 +178,40 @@ Route::get('/webhook1', [App\Http\Controllers\HomeController::class, 'webhook'])
 Route::get('/webhook2', [App\Http\Controllers\HomeController::class, 'webhook']);
 
 // new website
-Route::get('/home',[CashbackController::class,'index'])->name('home');
-Route::get('/',[CashbackController::class,'index']);
-Route::get('/contact',[CashbackController::class,'contact']);
+Route::get('/home', [CashbackController::class, 'index'])->name('home');
+Route::get('/', [CashbackController::class, 'index']);
+Route::get('/contact', [CashbackController::class, 'contact']);
 
 Route::get('subscription/create/{planId}', [PaypalSubscriptionController::class, 'createSubscription'])->name('subscription.create');
 Route::get('subscription/success', [PaypalSubscriptionController::class, 'success'])->name('subscription.success');
 Route::get('subscription/cancel', [PaypalSubscriptionController::class, 'cancel'])->name('subscription.cancel');
 Route::get('paypal/createplan', [PaypalSubscriptionController::class, 'createplan']);
-Route::get('paypal/savesubscription', [PaypalSubscriptionController::class, 'savesubscription']);
+Route::post('paypal/savesubscription', [PaypalSubscriptionController::class, 'savesubscription']);
 Route::get('payment/{id}', [PaypalSubscriptionController::class, 'payment_page']);
 Route::get('payment_status', [PaypalSubscriptionController::class, 'payment_status']);
+
+
+Route::any('dd', function () {
+//    I-SB4F31EC1AR9
+    $clientId = env('PAYPAL_CLIENT_ID');
+    $clientSecret = env('PAYPAL_CLIENT_SECRET');
+
+    $response = Http::withBasicAuth($clientId, $clientSecret)
+        ->asForm()
+        ->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
+            'grant_type' => 'client_credentials',
+        ]);
+
+//    return $response->json()['access_token'] ?? null;
+
+    $response = Http::withToken($response->json()['access_token'])
+        ->acceptJson()
+        ->get("https://api-m.sandbox.paypal.com/v1/billing/subscriptions/I-SB4F31EC1AR9");
+
+    if ($response->failed()) {
+        throw new \Exception($response->json()['message'] ?? 'Error retrieving subscription');
+    }
+
+    dd($response->json());
+
+});

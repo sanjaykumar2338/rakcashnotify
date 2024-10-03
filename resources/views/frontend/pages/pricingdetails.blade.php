@@ -2,7 +2,7 @@
 @section('content')
 
     <style type="text/css">
-     
+
         .example.example5 {
             /*   background-color: #333; */
             padding: 5px;
@@ -381,7 +381,7 @@
 
     <div class="loading" hidden id="screen-loader">Loading&#8230;</div>
 
-    
+
 
     <section class="Support-Cause custom-margin-top">
         <div class="container">
@@ -484,7 +484,7 @@
                                     <button data-planid="{{$planId}}" style="margin-left: 25px;" id="check-coupon-btn">Apply Coupon</button>
                                 </div>
 
-                                <div id="coupon-errors" class="text-danger mt-1"></div> 
+                                <div id="coupon-errors" class="text-danger mt-1"></div>
 
                             </div>
                         </div>

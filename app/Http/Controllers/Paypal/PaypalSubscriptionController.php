@@ -8,6 +8,7 @@ use App\Models\Plans;
 use App\Models\User;
 use App\Models\UserSubscription;
 use DateTime;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use PayPalHttp\HttpException;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
@@ -211,18 +212,18 @@ class PaypalSubscriptionController extends Controller
 
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
+        $paypalApiUrl = env('PAYPAL_API_URL');
 
         $response = Http::withBasicAuth($clientId, $clientSecret)
             ->asForm()
-            ->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
+            ->post("{$paypalApiUrl}/v1/oauth2/token", [
                 'grant_type' => 'client_credentials',
             ]);
 
-        // Initialize PayPal API (assuming $paypal is set up properly)
         try {
             $subscr_data = Http::withToken($response->json()['access_token'])
                 ->acceptJson()
-                ->get("https://api-m.sandbox.paypal.com/v1/billing/subscriptions/{$subscription_id}");
+                ->get("{$paypalApiUrl}/v1/billing/subscriptions/{$subscription_id}");
         } catch (Exception $e) {
             return response()->json(['status' => 0, 'msg' => $e->getMessage()]);
         }

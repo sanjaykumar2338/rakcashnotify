@@ -32,7 +32,11 @@
     <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
-
+    <style>
+        .price-item{
+            height: 436px;
+        }
+    </style>
 </head>
 
 <body>

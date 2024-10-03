@@ -113,7 +113,7 @@
                     .then((result) => {
                         if (result.status == 1) {
                             // Redirect the user to the status page
-                            // window.location.href = "payment_status/" + result.ref_id;
+                            window.location.href = "/?ref_id=" + result.ref_id + "#plans";
                         } else {
                             resultMessage(result.msg);
                         }

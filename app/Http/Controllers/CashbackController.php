@@ -25,7 +25,10 @@ class CashbackController extends Controller
 {
     public function index() {
         $faq = Faqs::orderBy('order','asc')->get();
-        return view('frontend.mainsite.layouts.main')->with('faq', $faq);
+        $user = auth()->check();
+        $subscription = '';
+        if ($user) $subscription = \auth()->user()->subscriptions()->with('plan')->latest()->first();
+        return view('frontend.mainsite.layouts.main', compact('faq', 'subscription'));
     }
 
     public function contact() {

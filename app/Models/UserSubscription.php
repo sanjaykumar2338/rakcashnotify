@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserSubscription extends Model
 {
     public $timestamps = false;
+    const CREATED_AT = 'created';
+    const UPDATED_AT = 'updated';
     protected $fillable = [
         'user_id',
         'plan_id',
@@ -28,5 +30,9 @@ class UserSubscription extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function plan() {
+        return $this->belongsTo(Plans::class);
     }
 }

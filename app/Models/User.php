@@ -48,11 +48,15 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function tracks(){
+    public function tracks() {
         return $this->hasMany(Tracks::class);
     }
 
     public function sendPasswordResetNotification($token) {
         $this->notify(new CustomResetPasswordNotification($token));
+    }
+
+    public function subscriptions() {
+        return $this->hasMany(UserSubscription::class);
     }
 }

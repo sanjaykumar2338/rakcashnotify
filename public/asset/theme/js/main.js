@@ -10,8 +10,8 @@
         }, 1);
     };
     spinner(0);
-    
-    
+
+
     // Initiate the wowjs
     new WOW().init();
 
@@ -34,8 +34,8 @@
         smartSpeed: 1000,
         dots: false,
         loop: true,
-        nav : true,
-        navText : [
+        nav: true,
+        navText: [
             '<i class="bi bi-arrow-left"></i>',
             '<i class="bi bi-arrow-right"></i>'
         ],
@@ -51,8 +51,8 @@
         dotsData: true,
         loop: true,
         margin: 25,
-        nav : true,
-        navText : [
+        nav: true,
+        navText: [
             '<i class="bi bi-arrow-left"></i>',
             '<i class="bi bi-arrow-right"></i>'
         ]
@@ -84,36 +84,59 @@
         center: true,
         dots: true,
         loop: true,
-        nav : true,
-        navText : [
+        nav: true,
+        navText: [
             '<i class="bi bi-arrow-left"></i>',
             '<i class="bi bi-arrow-right"></i>'
         ],
     });
+
     function myMove() {
         let id = null;
-        const elem = document.getElementById("animate");   
+        const elem = document.getElementById("animate");
         let pos = 0;
         clearInterval(id);
         id = setInterval(frame, 5);
+
         function frame() {
-          if (pos == 350) {
-            clearInterval(id);
-          } else {
-            pos++; 
-            elem.style.top = pos + "px"; 
-            elem.style.left = pos + "px"; 
-          }
+            if (pos == 350) {
+                clearInterval(id);
+            } else {
+                pos++;
+                elem.style.top = pos + "px";
+                elem.style.left = pos + "px";
+            }
         }
-      }
+    }
 
 })(jQuery);
 
 
-document.querySelector('.back-to-top').addEventListener('click', function(e) {
+document.querySelector('.back-to-top').addEventListener('click', function (e) {
     e.preventDefault();
     document.querySelector('#home').scrollIntoView({
         behavior: 'smooth'
     });
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref_id = urlParams.get('ref_id');
+    const successMessage = document.getElementById('subscription-success');
+
+    if (ref_id) {
+        const plansSection = document.getElementById('plans');
+        plansSection.scrollIntoView({behavior: 'smooth'});
+
+        successMessage.style.display = 'block';
+
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 7000);
+
+        window.history.replaceState(null, null, window.location.pathname);
+    } else {
+        successMessage.style.display = 'none';
+    }
+});

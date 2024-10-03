@@ -37,7 +37,7 @@ class TrackController extends Controller
     public function destroy(Request $request, $id) {
         try {
             Tracks::where('id', $id)->delete();
-            return redirect()->back()->with('success', 'Alert deleted successfully.');
+            return redirect()->route('track')->with('success', 'Alert deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('success', $e->getMessage());
         }
@@ -55,9 +55,7 @@ class TrackController extends Controller
             $this->validate($request, [
                 'store' => 'required',
                 'discount_type' => 'required',
-                'operator' => 'required',
-                'price' => 'required',
-                'status' => 'required'
+                'price' => 'required'
             ], $customMessages);
 
             $price = $request->price; 
@@ -77,6 +75,7 @@ class TrackController extends Controller
             $track->discount_type = $request->discount_type;
             $track->operator = $request->operator;
             $track->price = $request->price;
+            $track->status = '';
             
             $track->alert_email = $request->alert_type=='email' ? 'email':'';
             $track->alert_text = $request->alert_type=='text' ? 'text':'';
@@ -101,56 +100,67 @@ class TrackController extends Controller
             'discount_type.required' => 'The amount field is required.',
             'price.required' => 'The amount field is required.',
         ];
-
+    
+        // Validate request input
         $this->validate($request, [
             'store' => 'required',
             'discount_type' => 'required',
-            'operator' => 'required',
             'price' => 'required',
             'alert_type' => 'required',
         ], $customMessages);
-
+    
+        // Format price to two decimal places
         $price = $request->price; 
         $priceDecimal = number_format((float)$price, 2, '.', '');
-
-        $oldtrack = Tracks::where(['user_id'=>Auth::id(),'store_id'=>$request->store,'discount_type'=>$request->discount_type,'price'=>$priceDecimal])->count();
-
-        if($oldtrack > 0){
+    
+        // Check for existing track with the same parameters
+        $oldtrack = Tracks::where([
+            'user_id' => Auth::id(),
+            'store_id' => $request->store,
+            'discount_type' => $request->discount_type,
+            'price' => $priceDecimal
+        ])->count();
+    
+        if($oldtrack > 0) {
             return redirect()->back()->with('error', 'You already have this alert set. Please change your parameters.');
         }
-
+    
+        // Fetch store data
         $rec = \DB::table('stores')->where('store_id', $request->store)->first();
         $status = $request->has('status') ? 1 : 0;
+    
+        // Create a new Track record
         $track = new Tracks;
         $track->user_id = Auth::id();
         $track->store_id = $request->store;
         $track->store_name = $rec->store_name;
         $track->discount_type = $request->discount_type;
         $track->operator = $request->operator;
-        $track->price = $request->price;
-        
-        if($request->has('track_page')){
-            if($request->alert_type=='text'){
-                $track->alert_text =$request->alert_type;
-            }
-
-            if($request->alert_type=='email'){
-                $track->alert_email = $request->alert_type;
-            }
-
-            if($request->alert_type=='both'){
+        $track->price = $priceDecimal;
+    
+        // Save alert types based on the selected value
+        switch ($request->alert_type) {
+            case 'text':
+                $track->alert_text = 'text';
+                $track->alert_email = null;
+                break;
+            case 'email':
+                $track->alert_email = 'email';
+                $track->alert_text = null;
+                break;
+            case 'both':
                 $track->alert_email = 'email';
                 $track->alert_text = 'text';
-            }
-        }else{
-            $track->alert_email = $request->alert_email;
-            $track->alert_text = $request->alert_text;
+                break;
         }
-
+    
+        // Save the track status and persist the record
         $track->status = $status;
         $track->save();
+    
         return redirect()->route('track')->with('success', 'Alert saved successfully.');
     }
+    
 
     public function sendSMSToUsers() {
 

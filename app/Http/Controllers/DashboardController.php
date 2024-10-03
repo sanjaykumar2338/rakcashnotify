@@ -24,7 +24,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $all_tracks = $user->tracks()->get();
 
-        return view('frontend.dashboard.editalert')->with('alert', $alert)->with('all_tracks',$all_tracks);
+        return view('frontend.mainsite.pages.editalert')->with('alert', $alert)->with('all_tracks',$all_tracks);
     }
 
     public function myalerts(){

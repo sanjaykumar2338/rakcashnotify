@@ -28,6 +28,8 @@
 
         <!-- Template Stylesheet -->
         <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
+
+        <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
     </head>
 
     <body>

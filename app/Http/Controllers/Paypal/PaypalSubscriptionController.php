@@ -14,6 +14,7 @@ use PayPalHttp\HttpException;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Illuminate\Http\Request;
 use Stripe\Plan;
+use Auth;
 
 class PaypalSubscriptionController extends Controller
 {
@@ -198,6 +199,48 @@ class PaypalSubscriptionController extends Controller
         }
     }
 
+    public function cancelSubscription($subscription_id)
+    {
+        $subscription = UserSubscription::findOrFail($subscription_id);
+
+        // Handle free plan cancellation locally
+        if ($subscription->plan->price == 0) {
+            $subscription->update(['status' => 'INACTIVE']);
+            return redirect(url('/#plans'))->with('success', 'Free plan canceled successfully.');
+        }
+
+        // For paid plans, cancel the subscription via PayPal
+        $clientId = env('PAYPAL_CLIENT_ID');
+        $clientSecret = env('PAYPAL_CLIENT_SECRET');
+        $paypalApiUrl = env('PAYPAL_API_URL');
+
+        try {
+            $response = Http::withBasicAuth($clientId, $clientSecret)
+                ->asForm()
+                ->post("{$paypalApiUrl}/v1/oauth2/token", [
+                    'grant_type' => 'client_credentials',
+                ]);
+
+            $accessToken = $response->json()['access_token'];
+
+            // Cancel the subscription in PayPal
+            $cancelResponse = Http::withToken($accessToken)
+                ->post("{$paypalApiUrl}/v1/billing/subscriptions/{$subscription->paypal_subscr_id}/cancel", [
+                    'reason' => 'User requested cancellation.',
+                ]);
+
+            if ($cancelResponse->successful()) {
+                $subscription->update(['status' => 'INACTIVE']);
+                return redirect(url('/#plans'))->with('success', 'Subscription canceled successfully.');
+            } else {
+                return redirect(url('/#plans'))->with('error', 'Failed to cancel subscription in PayPal.');
+            }
+
+        } catch (\Exception $e) {
+            return redirect(url('/#plans'))->with('error', 'Error occurred: ' . $e->getMessage());
+        }
+    }
+
     public function savesubscription(Request $request) {
         // Validate incoming data
         $request->validate([
@@ -300,6 +343,52 @@ class PaypalSubscriptionController extends Controller
             // Return error response if subscription data is empty
             return response()->json(['status' => 0, 'msg' => 'Subscription data not found.']);
         }
+    }
+
+    public function subscribeFree()
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Check if user already has an active subscription
+        $existingSubscription = UserSubscription::where('user_id', $user->id)
+            ->where('status', 'ACTIVE')
+            ->first();
+
+        // Prevent duplicate active subscriptions
+        if ($existingSubscription) {
+            return redirect(url('/#plans'))->with('error', 'You already have an active subscription.');
+        }
+
+        // Get the 'Free' plan from the plans table
+        $freePlan = Plans::where('name', 'Basic')->first();
+
+        // Validate if free plan exists
+        if (!$freePlan) {
+            return redirect(url('/#plans'))->with('error', 'Basic plan not found.');
+        }
+
+        // Create a new subscription for the user
+        $subscription = UserSubscription::create([
+            'user_id' => $user->id,
+            'plan_id' => $freePlan->id, // Free plan ID
+            'paypal_order_id' => null, // No PayPal order for free plan
+            'paypal_plan_id' => null,
+            'paypal_subscr_id' => null,
+            'valid_from' => now(),
+            'valid_to' => now()->addYears(100), // Set a distant future expiration for "forever free" plan
+            'paid_amount' => 0.00,
+            'currency_code' => 'USD',
+            'subscriber_id' => $user->id,
+            'subscriber_name' => $user->first_name . ' ' . $user->last_name,
+            'subscriber_email' => $user->email,
+            'status' => 'ACTIVE',
+            'created' => now(),
+            'modified' => now(),
+        ]);
+
+        // Return success message
+        return redirect()->route('dashboard.index')->with('success', 'You have successfully subscribed to the free plan.');
     }
 
     public function payment_page(Request $request, $id) {

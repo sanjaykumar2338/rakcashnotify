@@ -75,20 +75,15 @@ class HomeController extends Controller
         $currentPlanName = '';
 
         $user = auth()->user();
-        $userSubscribed = $user->subscribed();
-        if ($user){
-            $subscription = $user->subscription('default');
-            if ($subscription) {
-                $currentSubscribedPlanPriceId = $subscription->stripe_price;
+        $userSubscribed = $user->subscriptions();
 
-                $currentPlan = \App\Models\Plans::where('stripe_id', $currentSubscribedPlanPriceId)->first();
-                if($currentPlan){
-                    $currentPlanName = @$currentPlan->identifier;
-                }
-            }
-        }
+        $user = auth()->check();
+        $subscription = '';
+        if ($user) $subscription = \auth()->user()->subscriptions()->with('plan')->latest()->first();
+        //echo "<pre>"; print_r($subscription); die;
+        $currentPlanName = $subscription->plan->name;
 
-        return view('frontend.pages.track')->with('page', $track)->with('stores', $stores)->with('all_tracks',$all_tracks)->with('currentPlanName',$currentPlanName);
+        return view('frontend.mainsite.pages.track')->with('page', $track)->with('stores', $stores)->with('all_tracks',$all_tracks)->with('currentPlanName',$currentPlanName);
     }
 
     public function get_stores() {

@@ -189,6 +189,8 @@ Route::get('paypal/createplan', [PaypalSubscriptionController::class, 'createpla
 Route::post('paypal/savesubscription', [PaypalSubscriptionController::class, 'savesubscription']);
 Route::get('payment/{id}', [PaypalSubscriptionController::class, 'payment_page']);
 Route::get('payment_status', [PaypalSubscriptionController::class, 'payment_status']);
+Route::get('/cancel-subscription/{subscription_id}', [PaypalSubscriptionController::class, 'cancelSubscription'])->name('cancel.subscription');
+Route::get('/subscribe/free', [PaypalSubscriptionController::class, 'subscribeFree'])->name('subscribe.free');
 
 
 Route::any('dd', function () {

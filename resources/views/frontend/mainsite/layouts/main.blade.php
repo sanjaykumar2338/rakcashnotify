@@ -31,6 +31,7 @@
     <!-- Template Stylesheet -->
     <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
 
 </head>
 
@@ -183,11 +184,24 @@
             </div>
         </div>
 
+        @if(session('error'))
+            <div class="alert alert-danger" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div class="alert alert-success" style="color: green;font-size: 18px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div class="row g-5 justify-content-center">
+            <!-- Basic Plan (Free Forever) -->
             <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="price-item bg-light rounded text-center">
                     <div class="text-center text-dark border-bottom d-flex flex-column justify-content-center p-4"
-                         style="width: 100%; height: 160px;">
+                        style="width: 100%; height: 160px;">
                         <p class="fs-2 fw-bold text-uppercase mb-0">BASIC</p>
                         <div class="d-flex justify-content-center">
                             <strong class="align-self-start">$</strong>
@@ -196,25 +210,36 @@
                     </div>
                     <div class="text-center p-5">
                         <p class="fw-bold text-center">1 Alert</p>
-                        <p>&nbsp;</p>
+                        <p>Free Forever</p>
                         @if($subscription && $subscription->plan->name === 'Basic' && $subscription->status === 'ACTIVE')
                             <button class="btn btn-light rounded-pill py-2 px-5" disabled type="button">
                                 SUBSCRIBED
                             </button>
-                        @else
-                            <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/2" type="button">
-                                Get Started
+                            <a class="btn btn-danger rounded-pill py-2 px-5 mt-3" 
+                            href="{{ route('cancel.subscription', ['subscription_id' => $subscription->id]) }}">
+                                Cancel Subscription
                             </a>
+                        @else
+                            @if($subscription && $subscription->status === 'ACTIVE')
+                                <button class="btn btn-light rounded-pill py-2 px-5" onclick="showCancelAlert()" type="button">
+                                    Get Started
+                                </button>
+                            @else
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/subscribe/free" type="button">
+                                    Get Started
+                                </a>
+                            @endif
                         @endif
                     </div>
                 </div>
             </div>
 
+            <!-- Standard Plan -->
             <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="price-item bg-light rounded text-center">
                     <div class="pice-item-offer">Popular</div>
                     <div class="text-center text-primary border-bottom d-flex flex-column justify-content-center p-4"
-                         style="width: 100%; height: 160px;">
+                        style="width: 100%; height: 160px;">
                         <p class="fs-2 fw-bold text-uppercase mb-0">Standard</p>
                         <div class="d-flex justify-content-center">
                             <strong class="align-self-start">$</strong>
@@ -222,25 +247,36 @@
                         </div>
                     </div>
                     <div class="text-center p-5">
-                        <p class="fw-bold text-center">10 Alerts</p>
+                        <p class="fw-bold text-center">20 Alerts</p>
                         <p>&nbsp;</p>
                         @if($subscription && $subscription->plan->name === 'Standard' && $subscription->status === 'ACTIVE')
                             <button class="btn btn-light rounded-pill py-2 px-5" disabled type="button">
                                 SUBSCRIBED
                             </button>
-                        @else
-                            <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/1" type="button">Get
-                                Started
+                            <a class="btn btn-danger rounded-pill py-2 px-5 mt-3" 
+                            href="{{ route('cancel.subscription', ['subscription_id' => $subscription->id]) }}">
+                                Cancel Subscription
                             </a>
+                        @else
+                            @if($subscription && $subscription->status === 'ACTIVE')
+                                <button class="btn btn-light rounded-pill py-2 px-5" onclick="showCancelAlert()" type="button">
+                                    Get Started
+                                </button>
+                            @else
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/1" type="button">
+                                    Get Started
+                                </a>
+                            @endif
                         @endif
                     </div>
                 </div>
             </div>
 
+            <!-- Premium Plan -->
             <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="price-item bg-light rounded text-center">
                     <div class="text-center text-secondary border-bottom d-flex flex-column justify-content-center p-4"
-                         style="width: 100%; height: 160px;">
+                        style="width: 100%; height: 160px;">
                         <p class="fs-2 fw-bold text-uppercase mb-0">Premium</p>
                         <div class="d-flex justify-content-center">
                             <strong class="align-self-start">$</strong>
@@ -254,15 +290,34 @@
                             <button class="btn btn-light rounded-pill py-2 px-5" disabled type="button">
                                 SUBSCRIBED
                             </button>
-                        @else
-                            <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/3" type="button">
-                                Get Started
+                            <a class="btn btn-danger rounded-pill py-2 px-5 mt-3" 
+                            href="{{ route('cancel.subscription', ['subscription_id' => $subscription->id]) }}">
+                                Cancel Subscription
                             </a>
+                        @else
+                            @if($subscription && $subscription->status === 'ACTIVE')
+                                <button class="btn btn-light rounded-pill py-2 px-5" onclick="showCancelAlert()" type="button">
+                                    Get Started
+                                </button>
+                            @else
+                                <a class="btn btn-light rounded-pill py-2 px-5" href="{{url('/')}}/payment/3" type="button">
+                                    Get Started
+                                </a>
+                            @endif
                         @endif
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            function showCancelAlert() {
+                alert('You already have an active subscription. Please cancel your current plan before subscribing to a new one. Note that your added alerts will be deleted when you cancel.');
+            }
+        </script>
+
+
+
     </div>
 </div>
 

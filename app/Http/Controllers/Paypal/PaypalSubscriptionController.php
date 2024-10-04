@@ -243,6 +243,11 @@ class PaypalSubscriptionController extends Controller
 
     public function savesubscription(Request $request)
     {
+        // Ensure the user is logged in
+        if (!Auth::check()) {
+            return response()->json(['status' => 0, 'msg' => 'User is not logged in.', 'cancel_url' => $request->input('cancel_url')]);
+        }
+
         // Validate incoming data
         $request->validate([
             'order_id' => 'required|string',
@@ -256,10 +261,12 @@ class PaypalSubscriptionController extends Controller
         $return_url = $request->input('return_url');
         $cancel_url = $request->input('cancel_url');
 
+        // PayPal API credentials
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
         $paypalApiUrl = env('PAYPAL_API_URL');
 
+        // Get PayPal OAuth token
         $response = Http::withBasicAuth($clientId, $clientSecret)
             ->asForm()
             ->post("{$paypalApiUrl}/v1/oauth2/token", [
@@ -267,6 +274,7 @@ class PaypalSubscriptionController extends Controller
             ]);
 
         try {
+            // Retrieve the subscription details from PayPal
             $subscr_data = Http::withToken($response->json()['access_token'])
                 ->acceptJson()
                 ->get("{$paypalApiUrl}/v1/billing/subscriptions/{$subscription_id}");
@@ -278,45 +286,36 @@ class PaypalSubscriptionController extends Controller
             $status = $subscr_data['status'];
             $subscr_id = $subscr_data['id'];
             $plan_id = $subscr_data['plan_id'];
-            $custom_user_id = $subscr_data['custom_id'] ?? null;
-
             $created = (new DateTime($subscr_data['create_time']))->format("Y-m-d H:i:s");
             $valid_from = (new DateTime($subscr_data['start_time']))->format("Y-m-d H:i:s");
 
             // Get subscriber info
             $subscriber_email = $subscr_data['subscriber']['email_address'] ?? null;
             $subscriber_id = $subscr_data['subscriber']['payer_id'] ?? null;
-            $subscriber_name = trim($subscr_data['subscriber']['name']['given_name'] ?? '').' '.trim($subscr_data['subscriber']['name']['surname'] ?? '');
+            $subscriber_name = trim($subscr_data['subscriber']['name']['given_name'] ?? '') . ' ' . trim($subscr_data['subscriber']['name']['surname'] ?? '');
 
-            // Insert user details if not exists in the DB
-            $user = User::where('email', $subscriber_email)->first();
-            if (empty($custom_user_id)) {
-                $user = User::firstOrCreate(
-                    ['email' => $subscriber_email],
-                    ['first_name' => trim($subscr_data['subscriber']['name']['given_name'] ?? ''),
-                        'last_name' => trim($subscr_data['subscriber']['name']['surname'] ?? ''),
-                        'created_at' => now()]
-                );
-                $custom_user_id = $user->id;
-            }
+            // Use the authenticated user
+            $user = Auth::user();
 
-            // Get billing information
             $outstanding_balance_value = $subscr_data['billing_info']['outstanding_balance']['value'] ?? null;
             $last_payment_amount = $subscr_data['billing_info']['last_payment']['amount']['value'] ?? null;
-            $last_payment_curreny = $subscr_data['billing_info']['last_payment']['amount']['currency_code'] ?? null;
+            $last_payment_currency = $subscr_data['billing_info']['last_payment']['amount']['currency_code'] ?? null;
             $valid_to = (new DateTime($subscr_data['billing_info']['next_billing_time']))->format("Y-m-d H:i:s");
 
-            // Check if a subscription with the same ID exists
-            $subscription = UserSubscription::where('paypal_order_id', $order_id)->first();
+            // Check for existing subscription for the logged-in user
+            $existing_subscription = UserSubscription::where('user_id', $user->id)
+                ->where('paypal_subscr_id', $subscr_id)
+                ->first();
 
+            // Handle PayPal plan to local DB plan mapping
             $db_plan_id = env('PAYPAL_MODE') == 'sandbox'
                 ? Plans::where('dev_plan_id', $db_plan_id)->first()->id
                 : Plans::where('live_plan_id', $db_plan_id)->first()->id;
 
-            if (!$subscription) {
-                // Insert subscription data into the database
-                $subscription = UserSubscription::create([
-                    'user_id' => $custom_user_id,
+            if (!$existing_subscription) {
+                // Create a new subscription if it doesn't exist
+                $new_subscription = UserSubscription::create([
+                    'user_id' => $user->id,
                     'plan_id' => $db_plan_id,
                     'paypal_order_id' => $order_id,
                     'paypal_plan_id' => $plan_id,
@@ -324,7 +323,7 @@ class PaypalSubscriptionController extends Controller
                     'valid_from' => $valid_from,
                     'valid_to' => $valid_to,
                     'paid_amount' => $last_payment_amount,
-                    'currency_code' => $last_payment_curreny,
+                    'currency_code' => $last_payment_currency,
                     'subscriber_id' => $subscriber_id,
                     'subscriber_name' => $subscriber_name,
                     'subscriber_email' => $subscriber_email,
@@ -333,29 +332,41 @@ class PaypalSubscriptionController extends Controller
                     'modified' => now()
                 ]);
 
-                $user->subscription_id = $subscription->id;
+                // Update user's subscription reference
+                $user->subscription_id = $new_subscription->id;
                 $user->save();
+            } else {
+                // If the subscription exists, update the relevant information
+                $existing_subscription->update([
+                    'valid_to' => $valid_to,
+                    'status' => $status,
+                    'paid_amount' => $last_payment_amount,
+                    'modified' => now()
+                ]);
             }
 
-            // Return success response with the provided return_url
+            // Redirect to success page
             return response()->json(['status' => 1, 'msg' => 'Subscription created!', 'return_url' => $return_url]);
 
         } else {
-            // Return error response with the provided cancel_url
+            // If subscription data is empty, redirect to the cancel URL
             return response()->json(['status' => 0, 'msg' => 'Subscription data not found.', 'cancel_url' => $cancel_url]);
         }
     }
 
+
     // Success subscription handler
     public function subscriptionSuccess()
     {
-        return view('frontend.mainsite.pages.success'); // Load a success view
+        $page = (object)['title' => 'Payment Success', 'description' => ''];
+        return view('frontend.mainsite.pages.success', compact('page'));
     }
 
     // Failed subscription handler
     public function subscriptionFail()
     {
-        return view('frontend.mainsite.pages.fail'); // Load a failure view
+        $page = (object)['title' => 'Payment Failed', 'description' => ''];
+        return view('frontend.mainsite.pages.fail', compact('page'));
     }
 
     public function subscribeFree()

@@ -7,7 +7,7 @@
             <div class="col-lg-12 wow fadeInLeft" data-wow-delay="0.1s">
                 <h1>Subscription Failed</h1>
                 <p>Unfortunately, there was a problem processing your subscription. Please try again later or contact support.</p>
-                <a href="{{ url('/') }}" class="btn btn-danger">Go Back</a>
+                <a href="{{ url('/') }}#plans" class="btn btn-danger">Go Back</a>
             </div>
         </div>
     </div>

@@ -181,6 +181,7 @@ Route::get('/webhook2', [App\Http\Controllers\HomeController::class, 'webhook'])
 Route::get('/home', [CashbackController::class, 'index'])->name('home');
 Route::get('/', [CashbackController::class, 'index']);
 Route::get('/contact', [CashbackController::class, 'contact']);
+Route::post('/paypal/webhook/subscription-updated', [PayPalWebhookController::class, 'handleSubscriptionUpdated']);
 
 Route::get('subscription/create/{planId}', [PaypalSubscriptionController::class, 'createSubscription'])->name('subscription.create');
 Route::get('subscription/success', [PaypalSubscriptionController::class, 'success'])->name('subscription.success');

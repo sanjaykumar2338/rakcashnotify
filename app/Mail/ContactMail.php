@@ -26,7 +26,7 @@ class ContactMail extends Mailable
                         'phone' => $this->contactDetails['phone'],
                         'text' => $this->contactDetails['message'],
                     ])
-                    ->from($address = 'hello@Rakcashnotify.com', $name = 'Rakcashnotify Contact Form')
+                    ->from($address = 'info@Rakcashnotify.com', $name = 'Rakcashnotify Contact Form')
                     ->replyTo($this->contactDetails['email'], $this->contactDetails['name'])
                     ->subject('Rakcashnotify Contact Form');
     }

@@ -19,8 +19,11 @@
 
                     <img style="display:none;" src="/loader.gif" class="processing" alt="Processing..."/></div>
             </div>
-            <div id="paymentResponse" class="hidden"></div>
-            <div id="paypal-button-container" style="padding-left: 250px;"></div>
+            <div id="payment-wrapper" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                <div id="paymentResponse" class="hidden"></div>
+                <div id="paypal-button-container"></div>
+            </div>
+
         </div>
     </div>
 

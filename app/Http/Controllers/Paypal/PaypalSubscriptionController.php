@@ -371,6 +371,9 @@ class PaypalSubscriptionController extends Controller
 
     public function subscribeFree()
     {
+        if(!auth()->check()){
+            return redirect(url('/login'))->with('message', 'Please login first.');
+        }
         // Get the authenticated user
         $user = Auth::user();
 
@@ -416,7 +419,15 @@ class PaypalSubscriptionController extends Controller
     }
 
     public function payment_page(Request $request, $id) {
+        if(!auth()->check()){
+            return redirect(url('/login'))->with('message', 'Please login first.');
+        }
+
         $plan = \DB::table('plans')->where('id', $id)->first();
+        if(!$plan){
+            return redirect()->back()->with('message', 'No found!');
+        }
+
         $page = (object)['title' => 'Payment', 'description' => ''];
         $plan_id = env('PAYPAL_MODE') == 'sandbox' ? $plan->dev_plan_id : $plan->live_plan_id;
         return view('frontend.mainsite.pages.payment', compact('page', 'plan', 'plan_id'));

@@ -253,7 +253,7 @@ class HomeController extends Controller
         Mail::to('sk963070@gmail.com')->send(new ContactMail($request->all()));
 
         // Redirect back to the contact page with a success message
-        return redirect()->route('contact')->with('success', 'We have received your message and will get back to you soon.');
+        return redirect()->back()->with('success', 'We have received your message and will get back to you soon.');
     }
 
     public function products() {

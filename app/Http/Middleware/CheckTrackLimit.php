@@ -24,15 +24,17 @@ class CheckTrackLimit
         }
 
         $user = Auth::user();
-        
-        // Get the latest active subscription for the user
+
+        // Get the latest active subscription for the user, ensuring it's within the valid date range
         $subscription = $user->subscriptions()
             ->with('plan')
-            ->where('status', 'ACTIVE')  // Fetch only active subscriptions
+            ->where('status', 'ACTIVE') // Fetch only active subscriptions
+            ->whereDate('valid_from', '<=', now()) // Ensure the subscription is valid from the start date
+            ->whereDate('valid_to', '>=', now()) // Ensure the subscription is still valid
             ->latest()
             ->first();
 
-        // Check if the user has an active subscription
+        // Check if the user has a valid active subscription
         if ($subscription && $subscription->plan) {
             $currentPlan = $subscription->plan->name;
 
@@ -56,13 +58,13 @@ class CheckTrackLimit
                 }
             }
         } else {
-            // Redirect if the user has no active subscription
+            // Redirect if the user has no valid or active subscription
             return redirect()
                 ->route('track')
-                ->with('no_plan_error', 'To access all features, please subscribe to a plan first.');
+                ->with('no_plan_error', 'To access all features, please subscribe to a valid plan.');
         }
 
-        // Allow request to continue if within the track limit
+        // Allow request to continue if within the track limit and subscription is valid
         return $next($request);
     }
 }

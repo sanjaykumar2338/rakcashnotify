@@ -3,15 +3,20 @@
 
     <head>
         <meta charset="utf-8">
-        <title>{{env('APP_NAME2')}}</title>
+        <title>{{env('APP_NAME2')}} - Stay on Top of Rakuten Deals | Free Alerts for Cashback Savings!</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="" name="keywords">
-        <meta content="" name="description">
+        <meta name="description" content="Stay ahead of Rakuten cashback offers with our free alert tool. Get notified about the best deals and savings. Sign up for 2 free alerts today with RakCashNotify!">
+        <meta name="keywords" content="Rakuten deals, cashback alerts, savings tool, online shopping, free alerts, Rakuten savings, best deals">
+        <meta name="author" content="RakCashNotify">
+        <meta name="robots" content="index, follow">
+        <meta name="language" content="English">
+        <meta name="revisit-after" content="7 days">
+        <meta name="distribution" content="global">
 
         <!-- Google Web Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Rubik:wght@400;500&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- Icon Font Stylesheet -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
@@ -22,15 +27,16 @@
         <link href="{{asset('asset/theme/lib/owlcarousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
         <link href="{{asset('asset/theme/lib/lightbox/css/lightbox.min.css')}}" rel="stylesheet">
 
-
         <!-- Customized Bootstrap Stylesheet -->
         <link href="{{asset('asset/theme/css/bootstrap.min.css')}}" rel="stylesheet">
 
         <!-- Template Stylesheet -->
         <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
 
+        <!-- Favicon -->
         <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
     </head>
+
 
     <body>
 

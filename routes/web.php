@@ -194,28 +194,3 @@ Route::get('/cancel-subscription/{subscription_id}', [PaypalSubscriptionControll
 Route::get('/subscribe/free', [PaypalSubscriptionController::class, 'subscribeFree'])->name('subscribe.free');
 Route::get('/subscriptionstatus/success', [PaypalSubscriptionController::class, 'subscriptionSuccess']);
 Route::get('/subscriptionstatus/fail', [PaypalSubscriptionController::class, 'subscriptionFail']);
-
-Route::any('dd', function () {
-//    I-SB4F31EC1AR9
-    $clientId = env('PAYPAL_CLIENT_ID');
-    $clientSecret = env('PAYPAL_CLIENT_SECRET');
-
-    $response = Http::withBasicAuth($clientId, $clientSecret)
-        ->asForm()
-        ->post('https://api-m.sandbox.paypal.com/v1/oauth2/token', [
-            'grant_type' => 'client_credentials',
-        ]);
-
-//    return $response->json()['access_token'] ?? null;
-
-    $response = Http::withToken($response->json()['access_token'])
-        ->acceptJson()
-        ->get("https://api-m.sandbox.paypal.com/v1/billing/subscriptions/I-SB4F31EC1AR9");
-
-    if ($response->failed()) {
-        throw new \Exception($response->json()['message'] ?? 'Error retrieving subscription');
-    }
-
-    dd($response->json());
-
-});

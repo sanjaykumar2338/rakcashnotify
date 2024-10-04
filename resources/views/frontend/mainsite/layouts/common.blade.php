@@ -1,36 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <title>{{env('APP_NAME2')}}</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="" name="keywords">
-        <meta content="" name="description">
+<head>
+    <meta charset="utf-8">
+    <title>Stay on Top of Rakuten Deals - Free Alerts for Cashback Savings! | RakCashNotify</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Rakuten deals, cashback alerts, savings tool, online shopping, free alerts, Rakuten savings, best deals" name="keywords">
+    <meta content="Get notified of the latest Rakuten cashback offers with our free alert tool. Never miss a deal and maximize your savings. Sign up for 2 free alerts today!" name="description">
 
-        <!-- Google Web Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Rubik:wght@400;500&display=swap" rel="stylesheet"> 
+    <!-- Open Graph Tags for social sharing -->
+    <meta property="og:title" content="Stay on Top of Rakuten Deals - Free Alerts for Cashback Savings! | RakCashNotify">
+    <meta property="og:description" content="Get notified of the latest Rakuten cashback offers with our free alert tool. Sign up for 2 free alerts today and never miss out on savings!">
+    <meta property="og:image" content="{{ asset('asset/theme/img/fav.webp') }}">
+    <meta property="og:url" content="https://www.rakcashnotify.com/">
+    <meta property="og:type" content="website">
 
-        <!-- Icon Font Stylesheet -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Stay on Top of Rakuten Deals - Free Alerts for Cashback Savings! | RakCashNotify">
+    <meta name="twitter:description" content="Get notified of Rakuten cashback offers. Sign up for free alerts and never miss out on savings!">
+    <meta name="twitter:image" content="{{ asset('asset/theme/img/fav.webp') }}">
 
-        <!-- Libraries Stylesheet -->
-        <link href="{{asset('asset/theme/lib/animate/animate.min.css')}}" rel="stylesheet">
-        <link href="{{asset('asset/theme/lib/owlcarousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
-        <link href="{{asset('asset/theme/lib/lightbox/css/lightbox.min.css')}}" rel="stylesheet">
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Rubik:wght@400;500&display=swap" rel="stylesheet"> 
 
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-        <!-- Customized Bootstrap Stylesheet -->
-        <link href="{{asset('asset/theme/css/bootstrap.min.css')}}" rel="stylesheet">
+    <!-- Libraries Stylesheet -->
+    <link href="{{asset('asset/theme/lib/animate/animate.min.css')}}" rel="stylesheet">
+    <link href="{{asset('asset/theme/lib/owlcarousel/assets/owl.carousel.min.css')}}" rel="stylesheet">
+    <link href="{{asset('asset/theme/lib/lightbox/css/lightbox.min.css')}}" rel="stylesheet">
 
-        <!-- Template Stylesheet -->
-        <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{asset('asset/theme/css/bootstrap.min.css')}}" rel="stylesheet">
 
-        <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
-    </head>
+    <!-- Template Stylesheet -->
+    <link href="{{asset('asset/theme/css/style.css')}}" rel="stylesheet">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('asset/theme/img/fav.webp')}}">
+</head>
+
 
     <body>
 

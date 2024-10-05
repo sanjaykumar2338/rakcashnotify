@@ -44,7 +44,8 @@ class HomeController extends Controller
 
     public function contactus() {
         $contact = Pages::where('slug', 'contact-us')->first();
-        return view('frontend.pages.contactus')->with('page', $contact);
+        $faq = Faqs::orderBy('order','asc')->get();
+        return view('frontend.mainsite.pages.contact')->with('faq', $faq)->with('page', $contact);
     }
 
     public function aboutus() {
